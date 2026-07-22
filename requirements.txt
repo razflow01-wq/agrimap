@@ -3,3 +3,4 @@ folium
 streamlit-folium
 scikit-learn
 fpdf
+earthengine-api
