@@ -79,7 +79,7 @@ def train_model():
     X, y = [], []
     cultures = ["maïs", "riz", "mil"]
 
-    for _ in range(300):
+    for _ in range(100):
         lat = random.uniform(10, 15)
         lon = random.uniform(-3, 2)
         culture = random.choice(cultures)
@@ -96,11 +96,15 @@ def train_model():
         X.append([lat, lon, cultures.index(culture)])
         y.append(rendement)
 
-    model = RandomForestRegressor(n_estimators=200)
+    model = RandomForestRegressor(n_estimators=50)
     model.fit(X, y)
     return model
 
-model = train_model()
+@st.cache_resource
+def get_model():
+    return train_model()
+
+model = get_model()
 @st.cache_data
 def predict_rendement(lat, lon, culture):
 
