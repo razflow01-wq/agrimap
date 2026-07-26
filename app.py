@@ -9,7 +9,6 @@ from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 from PIL import Image
 from fpdf import FPDF
-import ee
 
 if "champs" not in st.session_state:
     st.session_state.champs = []
@@ -18,10 +17,14 @@ if "champs" not in st.session_state:
 st.set_page_config(page_title="Agri Burkina 🇧🇫", layout="wide")
 
 # ================= EARTH ENGINE =================
+EE_AVAILABLE = False
+
 try:
+    import ee
     ee.Initialize(project='capable-passage-502408-t5')
-except:
-    ee.Initialize(project='capable-passage-502408-t5')
+    EE_AVAILABLE = True
+except Exception as e:
+    st.warning("⚠️ Earth Engine non disponible sur cette version")
 
 # ================= LOGIN =================
 import hashlib
@@ -334,6 +337,11 @@ elif menu == "📊 Statistiques":
 
 # ================= NDVI =================
 elif menu == "🛰️ NDVI":
+
+    if not EE_AVAILABLE:
+        st.error("❌ NDVI indisponible (Earth Engine non connecté)")
+        st.info("💡 Cette fonctionnalité sera activée plus tard")
+        st.stop()
 
     st.subheader("🛰️ NDVI Satellite Réel")
 
