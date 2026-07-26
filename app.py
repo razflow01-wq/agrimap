@@ -10,6 +10,9 @@ import numpy as np
 from PIL import Image
 from fpdf import FPDF
 
+if "form_submitted" not in st.session_state:
+    st.session_state.form_submitted = False
+
 if "champs" not in st.session_state:
     st.session_state.champs = []
 
@@ -285,14 +288,17 @@ elif menu == "➕ Ajouter":
 
     st.subheader("Ajouter un champ")
 
-    @st.cache_data
-    def create_map():
-        return folium.Map(location=[12.5, -1.5], zoom_start=6)
+    # ✅ Carte légère (pas de cache bug)
+    carte = folium.Map(location=[12.5, -1.5], zoom_start=6)
 
-    carte = create_map()
+    map_data = st_folium(
+        carte,
+        use_container_width=True,
+        height=400,
+        key="map_add"
+    )
 
-    map_data = st_folium(carte, use_container_width=True, height=400)
-
+    # 📍 clic carte
     if map_data and map_data.get("last_clicked"):
         st.session_state.last_location = (
             map_data["last_clicked"]["lat"],
@@ -300,40 +306,45 @@ elif menu == "➕ Ajouter":
         )
         st.success("📍 Position sélectionnée")
 
-    nom = st.text_input("Nom du champ")
-    culture = st.text_input("Culture libre")
+    # ✅ FORMULAIRE (ANTI FREEZE)
+    with st.form("form_champ"):
 
-    st.markdown("### 📍 Ou entrer manuellement")
-    lat_manual = st.number_input("Latitude", value=0.0)
-    lon_manual = st.number_input("Longitude", value=0.0)
+        nom = st.text_input("Nom du champ")
+        culture = st.text_input("Culture libre")
 
-    if st.button("Ajouter"):
+        st.markdown("### 📍 Ou entrer manuellement")
+        lat_manual = st.number_input("Latitude", value=0.0)
+        lon_manual = st.number_input("Longitude", value=0.0)
 
-        if "last_location" in st.session_state:
-            lat, lon = st.session_state.last_location
-        else:
-            lat, lon = lat_manual, lon_manual
+        submit = st.form_submit_button("Ajouter")
 
-        rendement, sol, climat, ndvi, pluie = predict_rendement(lat, lon, culture)
+        if submit:
 
-        nouveau = {
-            "nom": nom,
-            "culture": culture,
-            "lat": lat,
-            "lon": lon,
-            "rendement": rendement,
-            "sol": sol,
-            "climat": climat,
-            "ndvi": ndvi,
-            "pluie": pluie
-        }
+            if "last_location" in st.session_state:
+                lat, lon = st.session_state.last_location
+            else:
+                lat, lon = lat_manual, lon_manual
 
-        st.session_state.champs.append(nouveau)
+            rendement, sol, climat, ndvi, pluie = predict_rendement(lat, lon, culture)
 
-        data[username] = st.session_state.champs
-        save_champs(data)
+            nouveau = {
+                "nom": nom,
+                "culture": culture,
+                "lat": lat,
+                "lon": lon,
+                "rendement": rendement,
+                "sol": sol,
+                "climat": climat,
+                "ndvi": ndvi,
+                "pluie": pluie
+            }
 
-        st.success("✅ Champ ajouté !")
+            st.session_state.champs.append(nouveau)
+
+            data[username] = st.session_state.champs
+            save_champs(data)
+
+            st.success("✅ Champ ajouté !")
 # ================= STATS =================
 elif menu == "📊 Statistiques":
 
