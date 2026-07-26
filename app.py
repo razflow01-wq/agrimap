@@ -285,7 +285,11 @@ elif menu == "➕ Ajouter":
 
     st.subheader("Ajouter un champ")
 
-    carte = folium.Map(location=[12.5, -1.5], zoom_start=6)
+   @st.cache_data
+def create_map():
+    return folium.Map(location=[12.5, -1.5], zoom_start=6)
+
+carte = create_map()
     map_data = st_folium(carte, use_container_width=True, height=400)
 
     if map_data and map_data.get("last_clicked"):
@@ -302,9 +306,9 @@ elif menu == "➕ Ajouter":
     lat_manual = st.number_input("Latitude", value=0.0)
     lon_manual = st.number_input("Longitude", value=0.0)
 
-    if st.button("Ajouter"):
+   if st.button("Ajouter"):
 
-     if "last_location" in st.session_state:
+    if "last_location" in st.session_state:
         lat, lon = st.session_state.last_location
     else:
         lat, lon = lat_manual, lon_manual
