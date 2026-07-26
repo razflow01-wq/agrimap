@@ -285,11 +285,12 @@ elif menu == "➕ Ajouter":
 
     st.subheader("Ajouter un champ")
 
-   @st.cache_data
-def create_map():
-    return folium.Map(location=[12.5, -1.5], zoom_start=6)
+    @st.cache_data
+    def create_map():
+        return folium.Map(location=[12.5, -1.5], zoom_start=6)
 
-carte = create_map()
+    carte = create_map()
+
     map_data = st_folium(carte, use_container_width=True, height=400)
 
     if map_data and map_data.get("last_clicked"):
@@ -297,7 +298,7 @@ carte = create_map()
             map_data["last_clicked"]["lat"],
             map_data["last_clicked"]["lng"]
         )
-        st.success(f"📍 Position sélectionnée")
+        st.success("📍 Position sélectionnée")
 
     nom = st.text_input("Nom du champ")
     culture = st.text_input("Culture libre")
@@ -306,34 +307,33 @@ carte = create_map()
     lat_manual = st.number_input("Latitude", value=0.0)
     lon_manual = st.number_input("Longitude", value=0.0)
 
-   if st.button("Ajouter"):
+    if st.button("Ajouter"):
 
-    if "last_location" in st.session_state:
-        lat, lon = st.session_state.last_location
-    else:
-        lat, lon = lat_manual, lon_manual
+        if "last_location" in st.session_state:
+            lat, lon = st.session_state.last_location
+        else:
+            lat, lon = lat_manual, lon_manual
 
-    rendement, sol, climat, ndvi, pluie = predict_rendement(lat, lon, culture)
+        rendement, sol, climat, ndvi, pluie = predict_rendement(lat, lon, culture)
 
-    nouveau = {
-        "nom": nom,
-        "culture": culture,
-        "lat": lat,
-        "lon": lon,
-        "rendement": rendement,
-        "sol": sol,
-        "climat": climat,
-        "ndvi": ndvi,
-        "pluie": pluie
-    }
+        nouveau = {
+            "nom": nom,
+            "culture": culture,
+            "lat": lat,
+            "lon": lon,
+            "rendement": rendement,
+            "sol": sol,
+            "climat": climat,
+            "ndvi": ndvi,
+            "pluie": pluie
+        }
 
-    st.session_state.champs.append(nouveau)
+        st.session_state.champs.append(nouveau)
 
-    data[username] = st.session_state.champs
-    save_champs(data)
+        data[username] = st.session_state.champs
+        save_champs(data)
 
-    st.success("✅ Champ ajouté !")
-
+        st.success("✅ Champ ajouté !")
 # ================= STATS =================
 elif menu == "📊 Statistiques":
 
