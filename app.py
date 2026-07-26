@@ -21,7 +21,6 @@ st.set_page_config(page_title="Agri Burkina 🇧🇫", layout="wide")
 try:
     ee.Initialize(project='capable-passage-502408-t5')
 except:
-    ee.Authenticate()
     ee.Initialize(project='capable-passage-502408-t5')
 
 # ================= LOGIN =================
